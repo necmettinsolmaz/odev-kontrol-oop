@@ -1,0 +1,236 @@
+ /* ========================================= */
+    /* 1. KART VE SAYFA GENEL YAPILANDIRMASI */
+    /* ========================================= */
+
+    /* Ana sayfa ayarları */
+
+    
+    /* Ana Ödev Kartı (Kapsayıcı) */
+    .plan-card { 
+        max-width: 360px; 
+        margin: 0 auto; 
+        border-radius: 10px; 
+        box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1); 
+        background-color: white; 
+        line-height: 1.3; 
+    }
+
+    /* Kart Başlığı (Ders Adı Kısmı) */
+    .plan-header { 
+        color: white; 
+        padding: 6px 6px; 
+        margin: 0; 
+        border-radius: 10px 10px 0 0; 
+        font-size: 1.05em; 
+        text-align: center; 
+    } 
+    
+    /* Kartın İçeriği (Ödev Listesi Kısmı) */
+    .plan-body { 
+        padding: 10px; 
+    }
+    
+    /* Tek Bir Ödevin Satırı */
+    .homework-item { 
+        display: flex; 
+        gap: 10px; 
+        padding-top: 10px; 
+        padding-bottom: 10px; 
+        margin-bottom: 0;
+        border-bottom: 1px dashed #e5e7eb; 
+        position: relative; 
+    }
+
+    /* ========================================= */
+    /* 2. SOL SÜTUN (KONU, KAYNAK, SAYFA) */
+    /* ========================================= */
+
+    /* Bilgi Bölümünü Kapsayan Konteyner */
+    .info-section { 
+        flex-basis: 65%; /* Genişlik oranı */
+        display: flex; 
+        flex-direction: column; 
+        padding-right: 5px; 
+    }
+
+    /* Konu Başlık Metni ve İkonunun Kapsayıcısı */
+    .topic-text { 
+        font-weight: 700; 
+        color: #1a202c; 
+        margin: 0; 
+        font-size: 1.2em; 
+        white-space: nowrap; 
+        overflow: hidden; 
+        text-overflow: ellipsis; 
+        margin-bottom: 5px; 
+        display: flex; 
+        align-items: center; /* Dikey Hizalama için buraya eklendi */
+    }
+
+    /* Kaynak Satırı (Kitap Adı) Kapsayıcısı */
+    .source-line { 
+        display: flex; 
+        align-items: center; /* Dikey Hizalama için buraya eklendi */
+        font-size: 0.85em; 
+        color: #1a202c;
+        font-weight: 500; 
+        margin-bottom: 4px; 
+    }
+    
+    /* Sayfa Aralığı ve Ağırlık Alanı Kapsayıcısı */
+    .page-weight-area { 
+        display: flex; 
+        align-items: center; 
+        margin-top: 5px; 
+    }
+
+    /* Sayfa Aralığı Metni */
+    .page-range-label { 
+        font-size: 0.8em; 
+        color: #1a202c; 
+        font-weight: 500; 
+        margin-right: 10px; 
+        white-space: nowrap; 
+        display: flex; 
+        align-items: center; 
+    }
+
+/* Ağırlık Göstergesi Daire Kapsayıcısı */
+.weight-block-container { 
+    width: 20px; 
+    height: 20px; 
+    border-radius: 50%; /* Daire şeklini koruyor */
+    display: flex; 
+    justify-content: center; /* İÇTEKİ BLOĞU ORTALA */
+    align-items: center; /* İÇTEKİ BLOĞU ORTALA */
+    /* background-color: #e2e8f0; -> GRİ ARKA PLAN KALDIRILDI */
+    background-color: transparent; /* Şeffaf yapıldı */
+}
+.weight-block { 
+    width: 20px; /* Dairenin sabit boyutu */
+    height: 20px; /* Dairenin sabit boyutu */
+    border-radius: 50%; /* Tam yuvarlak şekil */
+    transition: all 0.3s; /* Hem boyut hem renk geçişleri için */
+    
+    /* Başlangıçta görünmez olması için isteğe bağlı olarak */
+    /* background-color: transparent; */ 
+}
+    .weight-low .weight-block { background-color: #48bb78; }    
+    .weight-medium .weight-block {  background-color: #ecc94b; }  
+    .weight-high .weight-block {  background-color: #e53e3e; }   
+
+
+    /* ========================================= */
+    /* 3. İKON VE SVG GENEL STİLLERİ */
+    /* ========================================= */
+
+    /* Genel SVG İkon (Tüm küçük SVG'ler için) */
+    .svg-icon { 
+        width: 1.1em; 
+        height: 1.1em; 
+        display: inline-block; 
+        vertical-align: middle; /* Dikey hizalama için önemli */
+    }
+    /* Konu İkonu (Etiket) */
+    .topic-icon-container { 
+        margin-right: 5px; 
+        color: #4a5568; 
+    }
+    /* Kaynak İkonu (Kitap) */
+    .source-icon-container { 
+        margin-right: 5px; 
+        color: #718096; 
+    }
+    /* Sayfa İkonu (Doküman) 
+    .page-label-svg { 
+        width: 1.1em; 
+        height: 1.1em; 
+        display: inline-block; 
+        vertical-align: middle; 
+        margin-right: 4px; 
+        color: #1a202c; 
+    }*/
+    
+
+    /* ========================================= */
+    /* 4. SAĞ SÜTUN (ZAMAN ÇİZELGESİ) */
+    /* ========================================= */
+
+    /* Zaman Çizelgesi Sütun Kapsayıcısı */
+    .timeline-section { 
+        flex-basis: 35%; /* Genişlik oranı */
+        position: relative; 
+        padding-left: 10px; 
+    }
+
+    /* Orta Dikey Çizgi */
+    .timeline-line { 
+        position: absolute; 
+        left: 0; 
+        top: 20px; 
+        bottom: 20px; 
+        width: 2px; 
+        background-color: #e2e8f0; 
+    } 
+    
+    /* Başlangıç/Bitiş Tarihi Noktası Kapsayıcısı */
+    .date-point-container { 
+        display: flex; 
+        align-items: center; 
+        position: absolute; 
+        left: 0; 
+        padding-left: 10px;
+    }
+    .start-date-container { top: 0; } 
+    .end-date-container { bottom: 0; } 
+    
+    /* Zaman Çizgisi Daire İkonu (Zamanı belirten Play/Stop ikonları) */
+    .timeline-icon { 
+        position: absolute; 
+        left: -10px; 
+        z-index: 2;
+        
+        width: 20px; 
+        height: 20px; 
+        border-radius: 50%;
+        padding: 1px;
+        
+        display: flex; 
+        align-items: center; 
+        justify-content: center;
+        
+        background-color: white; 
+        color: #4a5568; 
+        /* Not: border ve box-shadow kaldırılmış/azaltılmış */
+    }
+
+    .timeline-icon svg {
+        width: 100%; 
+        height: 100%;
+    }
+
+    /* Tarih Metinleri */
+    .date-text { 
+        font-size: 0.85em; 
+        font-weight: 500; 
+        padding-left: 20px; 
+        white-space: nowrap; 
+        color: #4a5568; /* start-text ve end-text'teki renk buraya taşındı */
+    } 
+    
+    /* Gün Süresi Gösterimi (Ödev arasındaki gün sayısı) */
+    .duration-display {
+        position: absolute; 
+        top: 50%; 
+        left: 50%; 
+        transform: translate(-50%, -50%); 
+        
+        color: #718096; 
+        font-size: 0.6em; 
+        font-weight: 300; 
+        
+        z-index: 10; 
+        white-space: nowrap; 
+        display: flex; 
+        align-items: center; /* İkon ve metni ortalar */
+    }
