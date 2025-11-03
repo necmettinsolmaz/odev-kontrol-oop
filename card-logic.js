@@ -60,48 +60,80 @@ const ICON_CALENDAR_NEW_SVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="
             return date.toLocaleDateString('tr-TR', { day: 'numeric', month: 'short', weekday: 'short' }).replace('.', '');
         };
 
-        const calculateDays = (date1Str, date2Str) => {
-            if (!date1Str || !date2Str) return 0;
-            const date1 = new Date(date1Str + 'T00:00:00'); 
-            const date2 = new Date(date2Str + 'T00:00:00');
-            const diffTime = Math.abs(date2.getTime() - date1.getTime());
-            return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-        };
-const getPageWeight = (pages, durationDays) => {
-    // 1. Sayfa sayısını hesaplama (Eski kodunuzdan)
-    if (!pages || typeof pages !== 'string' || pages.toLowerCase() === 'uİea') return { count: 0, class: 'weight-low' };
-    let count;
-    if (pages.indexOf('-') === -1) {
-        count = parseInt(pages);
-    } else {
-        const [start, end] = pages.split('-').map(Number);
-        if (isNaN(start) || isNaN(end) || end < start) return { count: 0, class: 'weight-low' };
-        count = end - start + 1;
-    }
-    const pageCount = count;
 
-    // 2. Oranı Hesaplama (Yeni Mantık)
-    // Eğer süre 0 günse (Aynı gün ödev verilip kontrol ediliyorsa), en yüksek ağırlığı ver.
-    if (durationDays === 0) {
-        return { count: pageCount, class: 'weight-high' };
-    }
-    
-    // Oran = Sayfa Sayısı / Gün Süresi
-    const ratio = pageCount / durationDays; 
+    /* UTILS veya DATE_UTILS Dosyasında yer almalıdır */
+    const calculateDays = (date1Str, date2Str) => {
+        if (!date1Str || !date2Str) return 0;
+        
+        // Yalnızca YYYY-MM-DD formatını kullanarak tarih nesneleri oluşturur.
+        // Replace ile formatı düzeltmek, tarayıcı uyumluluğu için daha güvenlidir.
+        // 'T00:00:00' eklememek, saat dilimi kaymalarını engeller.
+        const date1 = new Date(date1Str.replace(/-/g, '/')); 
+        const date2 = new Date(date2Str.replace(/-/g, '/'));
+        
+        // Farkı milisaniye cinsinden hesapla
+        // date2.getTime() - date1.getTime() bize ödevin süresini verir.
+        const diffTime = date2.getTime() - date1.getTime();
+        
+        // Farkı tam gün sayısına çevir
+        const diffDays = diffTime / (1000 * 60 * 60 * 24);
+        
+        // Başlangıç tarihi bitiş tarihinden sonra ise veya fark negatifse 0 döndür
+        if (diffDays < 0 || isNaN(diffDays)) return 0;
+        
+        // NOT: Aynı gün için (1.5 -> 1.5) fark 0'dır.
+        // Bir gün sonraya kadar (1.5 -> 2.5) fark 1'dir.
+        return diffDays; 
+    };
 
-    // 3. Ağırlık Sınıfını Belirleme
-    let weightClass = 'weight-low'; // Varsayılan: Yeşil
-    
-    if (ratio > 1.6) {
-        weightClass = 'weight-high'; // Kırmızı (Zor)
-    } else if (ratio >= 1.0) {
-        weightClass = 'weight-medium'; // Sarı/Turuncu (Orta)
-    } 
-    // ratio < 1.0 ise zaten 'weight-low' (Yeşil) kalır.
 
-    return { count: pageCount, class: weightClass };
-};
-       const getSourceIcon = (sourceName) => {
+    /* getPageWeight fonksiyonu */
+    const getPageWeight = (pages, durationDays) => {
+        // 1. Sayfa sayısını hesaplama (Önceki sağlam mantık)
+        if (!pages || typeof pages !== 'string' || !pages.trim()) {
+            return { count: 0, class: 'weight-low' }; 
+        }
+
+        let pageCount;
+        if (pages.indexOf('-') === -1) {
+            pageCount = parseInt(pages.trim());
+        } else {
+            const [start, end] = pages.split('-').map(s => Number(s.trim()));
+            if (isNaN(start) || isNaN(end) || end < start) return { count: 0, class: 'weight-low' };
+            pageCount = end - start + 1;
+        }
+        
+        if (pageCount <= 0) return { count: 0, class: 'weight-low' }; 
+
+        // 2. Oranı Hesaplama
+        
+        // Eğer süre 0 günse (aynı gün verilip kontrol ediliyorsa), en yüksek ağırlığı ver.
+        if (durationDays === 0) {
+            return { count: pageCount, class: 'weight-high' };
+        }
+        
+        // Oran = Sayfa Sayısı / Gün Süresi
+        const ratio = pageCount / durationDays; 
+
+        // 3. Ağırlık Sınıfını Belirleme (YENİ EŞİKLER)
+        let weightClass = 'weight-low'; // Varsayılan: Yeşil
+        
+        // Ratio > 2 ise KIRMIZI
+        if (ratio > 2.0) {
+            weightClass = 'weight-high'; // Kırmızı (Çok Zor)
+            
+        // Ratio > 1 ise ve <= 2 ise SARI/TURUNCU
+        } else if (ratio > 1.0) {
+            weightClass = 'weight-medium'; // Sarı/Turuncu (Orta)
+            
+        // Ratio <= 1 ise YEŞİL
+        } else {
+            weightClass = 'weight-low'; // Yeşil (Kolay veya Makul)
+        } 
+
+        return { count: pageCount, class: weightClass };
+    };
+    const getSourceIcon = (sourceName) => {
     const name = sourceName ? sourceName.toLowerCase() : '';
 
     if (name.includes('soru bankası')) {
@@ -191,8 +223,6 @@ const getPageWeight = (pages, durationDays) => {
 // Bu fonksiyonu ana dosyanız (index.html) çağıracak.
 // cardId: Kartın yerleştirildiği DOM elemanının ID'si (örn: 'homework-card-placeholder')
 // targetClass: İndirilecek dosya adı için sınıf adı
-// card-logic.js dosyasındaki exportCardToPNG fonksiyonunun GÜNCELLENMİŞ HALİ:
-// card-logic.js dosyasındaki exportCardToPNG fonksiyonunun YENİ HALİ:
 // card-logic.js dosyasındaki exportCardToPNG fonksiyonunun YÜKSEK KALİTE HALİ
 const exportCardToPNG = (cardId, targetClass) => {
     return new Promise((resolve, reject) => { 
