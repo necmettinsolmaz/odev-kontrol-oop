@@ -339,7 +339,12 @@
             }
 
             saveClasses() {
-                localStorage.setItem('classes', JSON.stringify(this.classes));
+                try{
+                    localStorage.setItem('classes', JSON.stringify(this.classes));
+                }catch(e){
+                    console.error("Veri kaydı sırasında hata oluştu:", e);
+                }
+                
             }
 
             saveLessonName(name) {
@@ -359,6 +364,15 @@
                 this.saveClasses();
             }
 
+            updateClass(className, newClassData) {
+                // 1. Güncellenecek sınıfın, ana 'classes' dizisindeki konumunu bul
+                const index = this.classes.findIndex(c => c.className === className);
+
+                // 2. Eğer bulunduysa, ana listedeki veriyi güncel verilerle değiştir
+                if (index !== -1) {
+                    this.classes[index] = newClassData;
+                }
+            }
             // Yedekleme ve Yükleme için ham veriye erişim
             importAllData(data) {
                 this.classes = data;
@@ -479,6 +493,7 @@
             }
 
             // --- Ödev Yönetimi ---
+            // Manager / addHomework metodu (NİHAİ DÜZELTME)
             addHomework(source, topic, pages) {
                 if(!this.currentClass){ 
                     DOMHelper.showSaveNotification(true, 'Önce ödev eklemek istediğiniz sınıfı seçin.');
@@ -496,14 +511,23 @@
                 checkDateObj.setDate(givenDateObj.getDate() + 7);
                 let checkDate = DateUtils.getIsoDate(checkDateObj);
                 
+                // 1. Sınıf verisini al
                 const classData = this.dataStore.getClass(this.currentClass);
+                
                 const hw = { 
                     source, topic, pages, givenDate, checkDate, 
                     statuses: classData.students.map(()=> "") 
                 };
                 
+                // 2. Veriyi bellekteki kopyaya ekle
                 classData.homeworks.push(hw);
+                
+                // 3. KRİTİK: DataStore'un ana listesini güncel verilerle senkronize et
+                this.dataStore.updateClass(this.currentClass, classData); 
+
+                // 4. Kalıcı Kayıt: localStorage'a yaz (Artık bu çağrı güncel veriyi kaydeder)
                 this.dataStore.saveClasses();
+                
                 return true;
             }
 
@@ -728,27 +752,46 @@
 
             bindTableEvents(classData) {
                 // 1. Düz Metin Alanları Düzenleme
+                const parentContext = this; 
+
+                // 1. Düz Metin Alanları Düzenleme
                 document.querySelectorAll('.editable').forEach(cell => {
+                    // Her seferinde false olarak ayarla
                     cell.setAttribute('contenteditable', 'false');
-                    cell.addEventListener('dblclick', function() {
-                        this.setAttribute('contenteditable', 'true');
-                        this.focus();
-                        document.getSelection().collapse(this, 1);
+                    
+                    // dblclick - Düzeltme: Arrow Function kullanıldı ve event.target referansı alındı
+                    cell.addEventListener('dblclick', (e) => {
+                        const clickedCell = e.currentTarget; // Olayın bağlandığı hücreyi alır
+                        clickedCell.setAttribute('contenteditable', 'true');
+                        clickedCell.focus();
+                        
+                        // Eğer metin içeriği varsa imleci sonuna getir
+                        if (clickedCell.childNodes.length > 0) {
+                            document.getSelection().collapse(clickedCell, clickedCell.childNodes.length);
+                        }
                     });
-                    cell.addEventListener('blur', function() {
-                        const index = this.dataset.index;
-                        const field = this.dataset.field;
-                        classData.homeworks[index][field] = this.innerText.trim();
-                        this.manager.dataStore.saveClasses(); // Veri katmanını güncelle
-                        this.setAttribute('contenteditable', 'false');
+                    
+                    // blur - Önceki başarılı düzeltme (parentContext'i kullanır)
+                    cell.addEventListener('blur', function() { 
+                        const cellElement = this;
+                        const index = cellElement.dataset.index;
+                        const field = cellElement.dataset.field;
+                        
+                        // Veri güncelleme ve kaydetme için UIManager'ın bağlamını kullan
+                        classData.homeworks[index][field] = cellElement.innerText.trim();
+                        parentContext.manager.dataStore.saveClasses(); 
+                        cellElement.setAttribute('contenteditable', 'false'); // Düzenlemeyi kapat
                     });
+                    
+                    // keydown
                     cell.addEventListener('keydown', function(e) {
                         if (e.key === 'Enter') {
                             e.preventDefault();
-                            this.blur();
+                            this.blur(); // blur olayını tetikler
                         }
                     });
                 });
+            
                 
                 // 2. Durum Değiştirme (Tek Tıklama)
                 document.querySelectorAll('.status').forEach(cell => {
@@ -921,7 +964,8 @@
                 const pages = document.getElementById('pages').value.trim();
 
                 if(this.manager.addHomework(source, topic, pages)){
-                    this.renderer.render();
+                    //this.renderer.render();
+                    this.loadClass();
                     DOMHelper.showSaveNotification(false, 'Ödev başarıyla eklendi.');
                     document.getElementById('source').value = '';
                     document.getElementById('topic').value = '';
@@ -1086,63 +1130,116 @@
                 DOMHelper.showSaveNotification(false, 'CSV dışa aktarım başarılı.');
             }
 
-            handleShareToParent = () => {
-                 const currentClass = this.manager.currentClass;
-                 const subjectName = this.dataStore.getLessonName();
-                 
-                 if (!currentClass) {
-                    alert("Görselleştirilecek sınıf seçili değil.");
-                    return;
-                }
-                
-                const classData = this.dataStore.getClass(currentClass);
-                const cardPlaceholderId = 'homework-card-placeholder';
-                const placeholder = document.getElementById(cardPlaceholderId);
+handleShareToParent = () => {
+    const currentClass = this.manager.currentClass;
+    const subjectName = this.dataStore.getLessonName();
+    
+    if (!currentClass) {
+        alert("Görselleştirilecek sınıf seçili değil.");
+        return;
+    }
+    
+    const classData = this.dataStore.getClass(currentClass);
+    const cardPlaceholderId = 'homework-card-placeholder';
+    const placeholder = document.getElementById(cardPlaceholderId);
 
-                if (!classData || !window.createHomeworkPlanCardHTML || !placeholder || !window.exportCardToPNG) {
-                    alert("Görselleştirme için gerekli kütüphaneler (card-logic.js) yüklenemedi.");
-                    return;
-                }
-                // ==========================================================
-                // YENİ EKLEME: FİLTRELEMEYİ UYGULA
-                // ==========================================================
-                // 1. Satır No Filtre Metnini al
-                const rowRangeText = document.getElementById('filterRows').value.trim();
-                
-                // NOT: parseRowRanges fonksiyonunun tanımının dosyanın üst kısımlarında mevcut olduğunu varsayıyoruz.
-                const requiredRowNumbers = FilterHelper.parseRowRanges(rowRangeText); 
-                
-               // 1. Ödev listesinin bir kopyasını oluştur ve her ödeve orijinal sıra numarasını ekle
-                let homeworksWithOriginalIndex = classData.homeworks.map((hw, index) => {
-                    // Spread operatörü ile ödev verisini kopyala ve 'originalRowNumber' alanını ekle
-                    return {
-                        ...hw,
-                        originalRowNumber: index + 1 // 1-tabanlı sıra numarası
-                    };
-                });
-                
-                let homeworksToShare = homeworksWithOriginalIndex; // Başlangıçta tamamı
+    if (!classData || !window.createHomeworkPlanCardHTML || !placeholder || !window.exportCardToPNG) {
+        alert("Görselleştirme için gerekli kütüphaneler (card-logic.js) yüklenemedi.");
+        return;
+    }
+    
+    // ==========================================================
+    // FİLTRELEME MANTIĞI
+    // ==========================================================
+    const rowRangeText = document.getElementById('filterRows').value.trim();
+    const requiredRowNumbers = FilterHelper.parseRowRanges(rowRangeText); 
+    
+    let homeworksWithOriginalIndex = classData.homeworks.map((hw, index) => ({
+        ...hw,
+        originalRowNumber: index + 1
+    }));
+    
+    let homeworksToShare = homeworksWithOriginalIndex;
 
-               // 2. Eğer geçerli bir filtre varsa, yeni listeyi filtrele
-                if (requiredRowNumbers && requiredRowNumbers.length > 0) {
-                    homeworksToShare = homeworksWithOriginalIndex.filter((hwWithIndex) => {
-                        // Filtreleme, ödev nesnesine eklediğimiz 'originalRowNumber' üzerinden yapılır.
-                        return requiredRowNumbers.includes(hwWithIndex.originalRowNumber);
+    if (requiredRowNumbers && requiredRowNumbers.length > 0) {
+        homeworksToShare = homeworksWithOriginalIndex.filter((hwWithIndex) => 
+            requiredRowNumbers.includes(hwWithIndex.originalRowNumber)
+        );
+    }
+    
+    // Kartı DOM'a Enjekte Etme
+    const cardHTML = window.createHomeworkPlanCardHTML(
+        currentClass, 
+        subjectName, 
+        homeworksToShare 
+    );
+    placeholder.innerHTML = cardHTML;
+    
+    const cardElement = placeholder.querySelector('.plan-card'); 
+    const exportTargetClass = currentClass; // Dosya adı için sınıf adı
+
+    // Sadece kart elementi varsa görüntü yakalama ve paylaşım sürecini başlat
+    if (cardElement) {
+        // 1. Orijinal stilleri kaydet
+        const originalCardStyle = cardElement.style.cssText;
+        const originalPlaceholderStyle = placeholder.style.cssText;
+
+        // 2. Görünürlük ve boyut düzeltmeleri
+        placeholder.style.overflow = 'visible'; 
+        cardElement.style.width = 'auto'; 
+        cardElement.style.overflow = 'visible'; 
+        placeholder.style.width = 'fit-content';
+        placeholder.style.maxWidth = 'none';
+
+        // 3. PNG Olarak Yakalama, Paylaşma/İndirme (NİHAİ MANTIK)
+        window.exportCardToPNG(cardPlaceholderId, exportTargetClass)
+            .then(pngBlob => {
+                const fileName = `odev_takip_plani_${exportTargetClass}.png`;
+
+                // WEB SHARE API İLE PAYLAŞIM KONTROLÜ
+                if (navigator.share && navigator.canShare && pngBlob instanceof Blob) {
+                    
+                    const file = new File([pngBlob], fileName, { type: 'image/png' });
+
+                    // Paylaşım menüsünü aç
+                    return navigator.share({
+                        files: [file],
+                        title: `${currentClass} Ödev Planı`,
+                        text: `${currentClass} ${subjectName} Ödev Planı görseli ektedir.`,
                     });
+                } else {
+                    // FALLBACK: WEB SHARE API DESTEKLENMİYORSA (Masaüstü) -> İndir
+                    const link = document.createElement('a');
+                    link.download = fileName;
+                    link.href = URL.createObjectURL(pngBlob);
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                    
+                    URL.revokeObjectURL(link.href);
+                    console.log('Web Share API desteklenmiyor. Dosya indirildi.');
                 }
-                const cardHTML = window.createHomeworkPlanCardHTML(
-                    currentClass, 
-                    subjectName, 
-                    homeworksToShare
-                );
-
-                placeholder.innerHTML = cardHTML;
-                
-                window.exportCardToPNG(cardPlaceholderId, currentClass)
-                    .finally(() => {
-                        // İşlem bitince kartı kaldır
-                    });
-            }
+            })
+            .catch(error => {
+                // Hata yönetimi (Kullanıcı paylaşımı iptal ettiğinde AbortError oluşur)
+                if (error.name === 'AbortError') {
+                    console.log('Kullanıcı paylaşımı iptal etti.');
+                    return; 
+                }
+                console.error("Görüntü yakalama veya paylaşım sırasında hata oluştu:", error);
+                alert("İşlem sırasında bir hata oluştu: " + error.message);
+            })
+            .finally(() => {
+                // Temizlik: Orijinal stilleri geri yükle
+                cardElement.style.cssText = originalCardStyle;
+                placeholder.style.cssText = originalPlaceholderStyle;
+                placeholder.style.display = 'none';
+            });
+    } else {
+        // Kart elementi bulunamazsa, sessizce hatayı kaydet ve çık.
+        console.error("Kart elementi (.plan-card) DOM'da bulunamadı.");
+    }
+}
 
             // --- Ana Olay Dinleyicisi Bağlama ---
             bindGlobalEvents() {

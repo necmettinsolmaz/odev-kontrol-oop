@@ -192,8 +192,10 @@ const getPageWeight = (pages, durationDays) => {
 // cardId: Kartın yerleştirildiği DOM elemanının ID'si (örn: 'homework-card-placeholder')
 // targetClass: İndirilecek dosya adı için sınıf adı
 // card-logic.js dosyasındaki exportCardToPNG fonksiyonunun GÜNCELLENMİŞ HALİ:
+// card-logic.js dosyasındaki exportCardToPNG fonksiyonunun YENİ HALİ:
+// card-logic.js dosyasındaki exportCardToPNG fonksiyonunun YÜKSEK KALİTE HALİ
 const exportCardToPNG = (cardId, targetClass) => {
-    return new Promise((resolve, reject) => { // Promise döndürüyoruz
+    return new Promise((resolve, reject) => { 
         const cardElementContainer = document.getElementById(cardId);
         const cardElement = cardElementContainer.querySelector('.plan-card'); 
         
@@ -205,25 +207,39 @@ const exportCardToPNG = (cardId, targetClass) => {
         // Görselleştirme öncesinde kapsayıcıyı görünür yapın
         cardElementContainer.style.display = 'block';
 
-        domtoimage.toPng(cardElement)
-            .then(function (dataUrl) {
-                const link = document.createElement('a');
-                link.download = `odev_takip_plani_${targetClass}.png`;
-                link.href = dataUrl;
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
-                
-                resolve(); // Başarılı, promise'i çöz
-            })
-            .catch(function (error) {
-                console.error('PNG oluşturulurken hata:', error);
-                reject(error); // Hata durumunda promise'i reddet
-            })
-            .finally(() => {
-                // Görselleştirme sonrası kartı tekrar gizleyin (cleanup)
-                cardElementContainer.style.display = 'none';
-            });
+        // ==========================================================
+        // KRİTİK DEĞİŞİKLİK: Yüksek Çözünürlük Ayarları
+        // ==========================================================
+        const scale = 1.5; // Çözünürlük çarpanı (2x, 3x veya 4x deneyebilirsiniz)
+        const originalWidth = cardElement.offsetWidth;
+        const originalHeight = cardElement.offsetHeight;
+        
+        domtoimage.toBlob(cardElement, {
+            // Yakalama alanını 2 kat genişlik ve yükseklikle ayarla
+            width: originalWidth * scale,
+            height: originalHeight * scale,
+            // Yakalama sırasında kartın stilini sanal olarak büyüt
+            style: {
+                transform: 'scale(' + scale + ')',
+                transformOrigin: 'top left', // Büyütmeyi sol üst köşeden başlat
+                width: originalWidth + 'px',
+                height: originalHeight + 'px'
+            },
+            bgcolor: 'white' // Arka planın şeffaf değil, beyaz olmasını sağlar (Opsiyonel)
+        })
+        .then(function (blob) {
+            // SADECE Blob verisini ana fonksiyona döndürür.
+            resolve(blob); 
+        })
+        .catch(function (error) {
+            console.error('PNG oluşturulurken hata:', error);
+            reject(error);
+        })
+        .finally(() => {
+            // Görselleştirme sonrası kartı tekrar gizleyin (cleanup)
+            // Bu kısım index.html'deki handleShareToParent'e taşındığı için yorum satırında bırakıldı.
+            // cardElementContainer.style.display = 'none';
+        });
     });
 };
 window.createHomeworkPlanCardHTML = createHomeworkPlanCardHTML;
