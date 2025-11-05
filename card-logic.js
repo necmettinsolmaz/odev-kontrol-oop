@@ -88,13 +88,14 @@ const ICON_CALENDAR_NEW_SVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="
 
 
     /* getPageWeight fonksiyonu */
-    const getPageWeight = (pages, durationDays) => {
+     let pageCount;
+	const getPageWeight = (pages, durationDays) => {
         // 1. Sayfa sayısını hesaplama (Önceki sağlam mantık)
         if (!pages || typeof pages !== 'string' || !pages.trim()) {
             return { count: 0, class: 'weight-low' }; 
         }
 
-        let pageCount;
+       
         if (pages.indexOf('-') === -1) {
             pageCount = parseInt(pages.trim());
         } else {
@@ -168,7 +169,7 @@ const ICON_CALENDAR_NEW_SVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="
                     <div class="homework-item" ${isLastItem ? 'style="border-bottom: none; margin-bottom: 0; padding-bottom: 0;"' : ''}>
                         <div class="info-section">
                             <p class="topic-text">
-                                <span class="topic-icon-container">${hw.originalRowNumber}</span> ${hw.topic}
+                                <span class="topic-icon-container">${hw.originalRowNumber}-</span> ${hw.topic}
                             </p>
                             <div class="source-line">
                                 <span class="source-icon-container" style="color: #718096;">${sourceIcon}</span> ${hw.source}
@@ -179,7 +180,7 @@ const ICON_CALENDAR_NEW_SVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="
                                     ${ICON_DOCUMENT_TEXT_SVG} Sayfa: ${hw.pages || '-'}
                                 </span>
                                 <div class="weight-block-container ${weightClass}">
-                                    <div class="weight-block"></div>
+                                    <div class="weight-block">${pageCount}</div>
                                 </div>
                             </div>
                         </div>

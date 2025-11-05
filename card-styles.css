@@ -87,7 +87,7 @@
     .page-weight-area { 
         display: flex; 
         align-items: center; 
-        margin-top: 5px; 
+		padding-top: 5px;
     }
 
     /* Sayfa Aralığı Metni */
@@ -101,26 +101,29 @@
         align-items: center; 
     }
 
-/* Ağırlık Göstergesi Daire Kapsayıcısı */
-.weight-block-container { 
-    width: 20px; 
-    height: 20px; 
-    border-radius: 50%; /* Daire şeklini koruyor */
-    display: flex; 
-    justify-content: center; /* İÇTEKİ BLOĞU ORTALA */
-    align-items: center; /* İÇTEKİ BLOĞU ORTALA */
-    /* background-color: #e2e8f0; -> GRİ ARKA PLAN KALDIRILDI */
-    background-color: transparent; /* Şeffaf yapıldı */
-}
-.weight-block { 
-    width: 20px; /* Dairenin sabit boyutu */
-    height: 20px; /* Dairenin sabit boyutu */
-    border-radius: 50%; /* Tam yuvarlak şekil */
-    transition: all 0.3s; /* Hem boyut hem renk geçişleri için */
-    
-    /* Başlangıçta görünmez olması için isteğe bağlı olarak */
-    /* background-color: transparent; */ 
-}
+	/* Ağırlık Göstergesi Daire Kapsayıcısı */
+	.weight-block-container { 
+		width: 20px; 
+		height: 20px; 
+		border-radius: 50%; /* Daire şeklini koruyor */
+		display: flex; 
+		justify-content: center; /* İÇTEKİ BLOĞU ORTALA */
+		align-items: center; /* İÇTEKİ BLOĞU ORTALA */
+		/* background-color: #e2e8f0; -> GRİ ARKA PLAN KALDIRILDI */
+		background-color: transparent; /* Şeffaf yapıldı */
+	}
+	.weight-block { 
+		width: 16px; /* Dairenin sabit boyutu */
+		height: 16px; /* Dairenin sabit boyutu */
+		border-radius: 50%; /* Tam yuvarlak şekil */
+		transition: all 0.3s; /* Hem boyut hem renk geçişleri için */
+		display: flex; 
+		justify-content: center; /* İÇTEKİ BLOĞU ORTALA */
+		align-items: center;
+		color: white;
+		font-size: 0.6em;
+		font-weight: 400; 
+	}
     .weight-low .weight-block { background-color: #48bb78; }    
     .weight-medium .weight-block {  background-color: #ecc94b; }  
     .weight-high .weight-block {  background-color: #e53e3e; }   
