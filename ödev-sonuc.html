@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Öğrenci Performans Kartı (Sabit Boyut Etiketler - Düzeltildi)</title>
+    <title>Öğrenci Performans Kartı (PNG Rozetler - Sade Tasarım)</title>
     
     <style>
         /* GENEL VE KAPSAYICI STİLLER */
@@ -18,9 +18,9 @@
 
         .results-card-container {
             width: 320px; 
-            font-family: 'Inter', 'Segoe UI', Arial, sans-serif;
+            font-family: 'Inter', sans-serif;
+			font-weight: 300;
             background-color: white;
-            box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05); 
             border-radius: 4px; 
             overflow: hidden;
             border: 1px solid #f9fafb; 
@@ -36,45 +36,73 @@
             gap: 2px; 
             font-weight: 600;
             border-radius: 4px 4px 0 0;
-            background-color: #4f46e5; 
+            background-color: #3584c9; /* Daha soft mavi */
         }
         
         .header-title-row {
             display: flex;
             align-items: center;
-            font-size: 0.95em; 
+			justify-content: center;
+            font-size: 0.9em; /* Küçültüldü */
             gap: 5px; 
             margin-bottom: 2px; 
         }
         
         .header-topic-row {
+			display: flex;
+			justify-content: center;
             font-size: 0.7em; 
-            font-weight: 500;
-            opacity: 0.9;
-            padding-left: 20px; 
+            font-weight: 400;
+            opacity: 1;
         }
         
         .header-date-row {
             display: flex;
+			align-items: center;
             justify-content: space-between;
             font-size: 0.65em; 
             font-weight: 400;
-            opacity: 0.9;
+            opacity: 1;
             margin-top: 2px; 
+			gap: 4px;
         }
 
+		.date-separator {
+		  /* Yatay Çizgi Görünümü */
+		  display:flex;
+		  align-items: center;
+		  justify-content: center;
+		  width: 100%; /* Çizginin uzunluğu */
+		  height: 1px; /* Çizginin kalınlığı */
+		  background-color: #fff; 
+		}
         .header-date-item {
             display: flex;
+			flex-shrink:0;
             align-items: center;
-            gap: 2px; 
+            gap: 6px; 
         }
-
+		/* GÜN SAYISI DAİRESİ STİLİ (YENİ) */
+        .day-count-badge {
+            width: 18px; 
+            height: 18px;
+            border-radius: 50%;
+            background-color: #fff; 
+            color: #000; /* Mavi metin */
+            font-weight: 600;
+            font-size: 0.9em;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2; /* Çizginin üstünde görünmesini sağlar */
+        }
         .results-plan-header svg {
-            width: 14px; 
-            height: 14px; 
+            width: 16px; 
+            height: 16px; 
             stroke: white; 
             fill: none;
             flex-shrink: 0;
+            stroke-width: 2;
         }
 
         /* LİSTE İÇERİĞİ */
@@ -90,7 +118,7 @@
 
         .student-performance-item {
             padding: 6px 0; 
-            border-bottom: 1px solid #f9fafb; 
+            border-bottom: 1px solid #f3f4f6; /* Sade ve açık renkli ayırıcı */
             display: flex;
             flex-direction: column; 
             gap: 4px; 
@@ -112,12 +140,12 @@
             width: 32px; 
             height: 32px; 
             border-radius: 50%;
-            border: 1px solid #d1d5db; 
+            border: 1px solid #e5e7eb; /* Daha soft kenarlık */
             display: flex;
             align-items: center;
             justify-content: center;
             font-size: 0.8em;
-            font-weight: 700;
+            font-weight: 600; /* Kalınlık azaltıldı */
             color: #4b5563; 
             flex-shrink: 0; 
         }
@@ -133,121 +161,99 @@
         .student-name {
             font-weight: 600;
             color: #374151;
-            flex-grow: 1;
+            flex-shrink: 0; 
             font-size: 0.9em; 
+            margin-right: 4px; 
         }
 
-        /* Anlık Durum İkonu ve Metni - SABİT GENİŞLİK */
-        .current-status-icon {
+        /* DURUM ETİKETLERİ - SADELEŞTİRİLDİ */
+        .status-container {
+			display: flex;
+			align-items: center;
+			gap: 4px; 
+			flex-shrink: 0;
+		}
+
+		.status-icon-wrapper {
+			display: flex; 
+			width: 20px; /* Biraz büyütüldü */
+			height: 20px; /* Biraz büyütüldü */
+			flex-shrink: 0;
+		}
+        
+        .status-icon-wrapper svg {
+            stroke-width: 2; /* Daha ince çizgi */
+        }
+        
+        /* Önemli: Metin kutusunu (Label) kaldırıp sadece ikonu bırakıyoruz. */
+		.current-status-label {
+			display: none; 
+		}
+
+		/* DURUM RENKLERİ (İkonlar için) */
+		.status-yapmadi svg { stroke: #ef4444; } 
+		.status-eksik svg { stroke: #f59e0b; }
+		.status-yapti svg { stroke: #10b981; }
+		.status-gelmedi svg { stroke: #8b5cf6; }
+		.status-kitapyok svg { stroke: #4b5563; }
+		.status-bos svg { stroke: #9ca3af; }
+
+
+        /* ROZET ALANLARI */
+        .badge-area {
             display: flex;
             align-items: center;
-            justify-content: flex-start; 
-            gap: 2px; 
-            padding: 2px 5px; 
-            border-radius: 6px; 
-            font-size: 0.65em; 
-            font-weight: 500;
+            gap: 4px; 
+            margin-right: auto; 
+            flex-shrink: 1; 
+        }
+
+        .badge-icon {
+            display: flex; 
+            width: 16px; 
+            height: 16px; 
             flex-shrink: 0;
-            width: 50px; /* Sabit Genişlik */
         }
-
-        .current-status-icon svg {
-            width: 12px; 
-            height: 12px; 
-            stroke-width: 2.5;
+        
+        .badge-icon img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
         }
-		/* YENİ: İkon ve Etiket Metnini Bir Arada Tutan Kapsayıcı */
-		.status-container {
-			display: flex;
-			align-items: center;
-			gap: 4px; /* İkon ve metin kutusu arasındaki boşluk */
-			flex-shrink: 0;
-		}
-
-		/* YENİ: İkonun Kendisini Tutan Kısım */
-		.status-icon-wrapper {
-			display: flex; /* SVG'yi ortalamak için */
-			width: 18px; 
-			height: 18px; 
-			flex-shrink: 0;
-		}
-
-		/* YENİ: Sadece Metni Çevreleyen Etiket */
-		.current-status-label {
-			display: flex;
-			align-items: center;
-			padding: 2px 5px; 
-			border-radius: 4px; 
-			font-size: 0.7em; 
-			font-weight: 700;
-			/* Metin kutusunun görünümü: */
-			background-color: transparent; 
-			border: 1px solid #e5e7eb; 
-			color: #4b5563; /* Varsayılan metin rengi */
-			white-space: nowrap;
-			 width: 50px
-		}
-
-		.current-status-label .current-status-text {
-			line-height: 1; /* Metni dikeyde ortalamak için */
-		}
-
-		/* DURUM RENKLERİ (Verilen Palet) */
-				
-		/* Yapmadı (Kırmızı) */
-		.status-yapmadi svg { stroke: #ef4444; } /* İkon rengi */
-		.status-yapmadi.current-status-label { color: #ef4444; border-color: #fecaca; } /* Etiket metni ve kenarlık rengi */
-
-		/* Eksik (Turuncu) */
-		.status-eksik svg { stroke: #f59e0b; }
-		.status-eksik.current-status-label { color: #f59e0b; border-color: #fcd34d; }
-
-		/* Yaptı (Yeşil) */
-		.status-yapti svg { stroke: #10b981; }
-		.status-yapti.current-status-label { color: #10b981; border-color: #6ee7b7; }
-
-		/* Gelmedi (Mor) */
-		.status-gelmedi svg { stroke: #8b5cf6; }
-		.status-gelmedi.current-status-label { color: #8b5cf6; border-color: #a78bfa; }
-
-		/* KitapYok (Koyu Gri) */
-		.status-kitapyok svg { stroke: #4b5563; }
-		.status-kitapyok.current-status-label { color: #4b5563; border-color: #9ca3af; }
-
-		/* Bekliyor/Boş (Gri) */
-		.status-bos svg { stroke: #9ca3af; }
-		.status-bos.current-status-label { color: #9ca3af; border-color: #e5e7eb; }
 
 
         /* GEÇMİŞ PERFORMANS ÇUBUĞU */
+        .performance-footer {
+			display: flex;
+			align-items: center;
+			gap: 8px; 
+		}
+        
         .performance-history-bar {
             width: 100%;
             height: 4px; 
             display: flex;
+            flex-grow: 1; 
             overflow: hidden;
             border-radius: 2px; 
             background-color: #e5e7eb; 
             margin-top: 1px; 
             position: relative;
         }
-        .performance-footer {
-			display: flex;
-			align-items: center;
-			gap: 8px; /* Çubuk ve oran arasına boşluk */
-		}
+        
 		.completion-ratio {
 			font-size: 0.7em;
 			font-weight: 600;
-			color: #6b7280; /* Koyu gri oran metni */
+			color: #6b7280; 
 			flex-shrink: 0;
-			margin-left: auto; /* Otomatik itme */
+			margin-left: auto; 
 		}
+        
         .history-segment {
             height: 100%;
             position: relative;
         }
 
-        /* Segment Ayırıcıları */
         .history-segment:not(:last-child)::after {
             content: '';
             position: absolute;
@@ -267,10 +273,14 @@
         </div>
 
     <script>
-        // 1. HEROICONS OUTLINE TANIMLARI
-        const ICON_CHECKLIST_SVG = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>`;
-        const ICON_PLAY_SVG = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" /><path d="M10 8l4 4-4 4V8z"/></svg>`; 
-        const ICON_STOP_SVG = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16v16H4z"/></svg>`; 
+        // 1. İKON TANIMLARI (Lucide SVG'leri yerine Heroicons kullanılmıştı, onları geri alalım)
+        const ICON_CHECKLIST_SVG = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>`;
+        const ICON_PLAY_SVG = `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="size-6">
+  <path stroke-linecap="round" stroke-linejoin="round" d="M5.25 5.653c0-.856.917-1.398 1.667-.986l11.54 6.347a1.125 1.125 0 0 1 0 1.972l-11.54 6.347a1.125 1.125 0 0 1-1.667-.986V5.653Z" />
+</svg>`; 
+        const ICON_STOP_SVG = `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="size-6">
+  <path stroke-linecap="round" stroke-linejoin="round" d="M5.25 7.5A2.25 2.25 0 0 1 7.5 5.25h9a2.25 2.25 0 0 1 2.25 2.25v9a2.25 2.25 0 0 1-2.25 2.25h-9a2.25 2.25 0 0 1-2.25-2.25v-9Z" />
+</svg>`;
         
         // DURUM İKONLARI
         const ICON_YAPTI = `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>`;
@@ -278,22 +288,29 @@
         const ICON_EKSİK = `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.021 3.375 1.766 3.375h14.464c1.745 0 2.632-1.875 1.766-3.375L13.12 6.84a1.125 1.125 0 00-1.96 0L3.697 16.126z" /></svg>`;
         const ICON_BOS = `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6.75L12 10.5l-3.75-3.75" /></svg>`;
         
+        // ROZET İKONLARI (PNG Base64) - Önceki istekten alındı
+        const BADGE_DEFINITIONS = {
+            AltinKoza: { icon: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABmJLR0QA/wD/AP+gvaeTAAAAjElEQVQ4jWPkQ0x/Q0x/YwAjRkyI4X/A3f+D+/8/gM3/37+Bzv+PzWb4/zcwMjAwMAI8+c/A3f+Dv/8/A7v/P3QGtv//P34GFgYGBgYGNQdGhv+ffwaGhv+fPwPz/w8wMjAwMAw1B4YGgAYxGq41NlR1sDAw/D/wPwMjQ5oKk44gQWcQGBgYGRgYGBkYEAAAuP3/zUe+sJIAAAAASUVORK5CYII=', title: "Altın Koza: Tüm Ödevleri Başarıyla Tamamladı" }, 
+            HaftaninSerisi: { icon: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABmJLR0QA/wD/AP+gvaeTAAAAkklEQVQ4jWPkYGBgYGBgOqK0Bq+1HjQDBjBwMBBYjBgQGYxZkBmMMWkGGEMwMjAwMAw1hUYG/j/4/wcEgwEjA8wMhQ0MGQMjAwMDAwMDQ0ODgwD/jwwMDAwMDAwNDAwsQvD//z8gGAkYGBgYGhkYGGQ8GhkYGGRQdWBg+P/hZ8CffwMzA0NjY4vBgAGJgQEAq9hR6X7B9w8AAAAASUVORK5CYII=', title: "Haftanın Serisi: Son 3 Ödevde Kesintisiz Başarı" },
+            IstikrarYildizi: { icon: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABmJLR0QA/wD/AP+gvaeTAAAAhklEQVQ4jWPkYGBgYGDQZzJgQGaQGSwMjA8MDAwMPz8/QzAwMIA/Pz8DAwMDw/f//gYGBgZGBkYGBgYGBkYGY+QjMDAwMDAwMDAwMHAwMDAwMzAwMDAwMDCgIpgA8//P/w8zMzAwMDAwNNA0YGBgYGBgYGBgYGBgYGBgYNDf1MzAwPj/p87AwABu30eK1T5sngAAAABJRU5ErkJggg==', title: "İstikrar Yıldızı: Genel Tamamlanma Oranı %80 üzeri" },
+            DonemSampiyonu: { icon: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABmJLR0QA/wD/AP+gvaeTAAAAiklEQVQ4jWPkYGBgYGBgOuYyA52h+K8hQoF/kQEjA0MDQ0OD/w//Mzw8/H/+/gZGRsbGxiZGBkZGRob//38DAwMDPz8/QzAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMAw1B4YG/p/7/w9GRoYGhoaGBgYGBgYGBkYGFkYGBkYGhkYGGQ5GhsYGEA/BwACA4g4qJmI+7QAAAABJRU5ErkJggg==', title: "Dönem Şampiyonu: Son 4 Ödevin Hepsini Yaptı" },
+            GelisimOncusu: { icon: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABmJLR0QA/wD/AP+gvaeTAAAAiElEQVQ4jWPkYGBgYGBgOmYzQ6xQ/L/BwMDAwMDAwMDAwMDAwMDAOEZmBjMDAwMDPz8/QzAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMLFkMDBoaGhgaGBgYGDYyMTI0MTIyMDYwMjI0MjEyNDJgYGDYyMTI0MTAwMDAwMDAwMDAwMDA4F/SxgAAbW8q2X/G8yQAAAAASUVORK5CYII=', title: "Gelişim Öncüsü: Son Dönemde Büyük Gelişme Gösterdi" },
+        };
 
-        // 2. KULLANICIDAN GELEN JSON VERİSİ
+        // 2. KULLANICIDAN GELEN JSON VERİSİ 
         const rawClassesData = {
           "11MF1": {
             "students": ["Yusuf Emir", "Çağan", "Kaan A.", "Doruk Ü.", "Müge", "M. Emre Y.", "Efe Mert", "Kayra S."],
-            "homeworks": [{ "statuses": ["Yaptı", "Yaptı", "Yaptı", "Yaptı", "", "Yaptı", "Yaptı", "Yaptı"], "topic": "Sayı Kümeleri", "givenDate": "2025-09-06", "checkDate": "2025-09-13" }, { "statuses": ["Yaptı", "Yaptı", "Yaptı", "Eksik", "", "Yaptı", "Yaptı", "Yaptı"], "topic": "Sayı Çeşitleri", "givenDate": "2025-09-13", "checkDate": "2025-09-20" }, { "statuses": ["Yaptı", "Yaptı", "Yaptı", "Gelmedi", "", "Yapmadı", "Yaptı", "Yapmadı"], "topic": "Basamak Kavramı", "givenDate": "2025-09-20", "checkDate": "2025-09-27" }, { "statuses": ["", "", "", "", "", "", "", "Yaptı"], "topic": "Bölme-Bölünebilme", "givenDate": "2025-09-27", "checkDate": "2025-10-04" }, { "statuses": ["", "", "", "", "", "", "", "Yapmadı"], "topic": "Asal Çarpanlar", "givenDate": "2025-10-04", "checkDate": "2025-10-11" }, { "statuses": ["Yapmadı", "Yaptı", "Yapmadı", "KitapYok", "Yapmadı", "Yapmadı", "KitapYok", "Yapmadı"], "topic": "Ebob-Ekok Prob.", "givenDate": "2025-10-11", "checkDate": "2025-10-18" }, { "statuses": ["Yapmadı", "Yaptı", "Yaptı", "Yapmadı", "Gelmedi", "Yaptı", "Yapmadı", "Yapmadı"], "topic": "Rasyonel Sayılar", "givenDate": "2025-10-18", "checkDate": "2025-10-25" }]
+            "homeworks": [{ "statuses": ["Yaptı", "Yaptı", "Yaptı", "Yaptı", "", "Yaptı", "Yaptı", "Yaptı"], "topic": "Sayı Kümeleri", "givenDate": "2025-09-06", "checkDate": "2025-09-13" }, { "statuses": ["Yaptı", "Yaptı", "Yaptı", "Eksik", "", "Yaptı", "Yaptı", "Yaptı"], "topic": "Sayı Çeşitleri", "givenDate": "2025-09-13", "checkDate": "2025-09-20" }, { "statuses": ["Yaptı", "Yaptı", "Yaptı", "Gelmedi", "", "Yapmadı", "Yaptı", "Yapmadı"], "topic": "Basamak Kavramı", "givenDate": "2025-09-20", "checkDate": "2025-09-27" }, { "statuses": ["Yaptı", "Yaptı", "Yaptı", "Yaptı", "", "Yaptı", "Yaptı", "Yaptı"], "topic": "Bölme-Bölünebilme", "givenDate": "2025-09-27", "checkDate": "2025-10-04" }, { "statuses": ["Yaptı", "Yaptı", "Yaptı", "Yaptı", "", "Yaptı", "Yaptı", "Yaptı"], "topic": "Asal Çarpanlar", "givenDate": "2025-10-04", "checkDate": "2025-10-11" }, { "statuses": ["Yapmadı", "Yaptı", "Yaptı", "KitapYok", "Yapmadı", "Yapmadı", "KitapYok", "Yapmadı"], "topic": "Ebob-Ekok Prob.", "givenDate": "2025-10-11", "checkDate": "2025-10-18" }, { "statuses": ["Yapmadı", "Yaptı", "Yaptı", "Yapmadı", "Gelmedi", "Yaptı", "Yapmadı", "Yapmadı"], "topic": "Rasyonel Sayılar", "givenDate": "2025-10-18", "checkDate": "2025-10-25" }]
           },
         };
         
         // --- Sabitler ---
         const TARGET_CLASS = "11MF1"; 
-        const CLASS_HEADER_COLOR = "#4f46e5"; 
+        const CLASS_HEADER_COLOR = "#3584c9"; // Sadeleştirilmiş başlık rengi 
         
         // 3. YARDIMCI FONKSİYONLAR
         
-        // Durumları puanlayan ve renklendiren yardımcı fonksiyon
         const getStatusData = (status) => {
             const normalizedStatus = status.toLowerCase().replace(/\s/g, ''); 
             
@@ -320,10 +337,23 @@
             }
         };
 
-        // Tüm veriyi öğrenci bazında düzenleyen ve puan hesaplayan ana fonksiyon
+        // Rozet HTML'i oluşturma fonksiyonu (PNG için)
+        const createBadgesHTML = (badgesArray) => {
+            if (badgesArray.length === 0) return '';
+
+            return badgesArray.map(badgeKey => {
+                const badge = BADGE_DEFINITIONS[badgeKey];
+                if (!badge) return '';
+                
+                return `<span class="badge-icon" title="${badge.title}"><img src="${badge.icon}" alt="${badgeKey} Rozeti"/></span>`;
+            }).join('');
+        };
+
+
         const prepareStudentData = (classObj) => {
             const students = classObj.students;
             const homeworks = classObj.homeworks;
+            const totalHomeworks = homeworks.length;
 
             const studentPerformanceList = students.map((studentName, studentIndex) => {
                 let totalScore = 0;
@@ -333,7 +363,8 @@
                 homeworks.forEach((hw) => {
                     const statusText = hw.statuses[studentIndex] || ""; 
                     const statusData = getStatusData(statusText);
-					if (statusText.toLowerCase().replace(/\s/g, '') === 'yaptı') {
+					
+                    if (statusText.toLowerCase().replace(/\s/g, '') === 'yaptı') {
 						completedCount++; 
 					};
                     
@@ -341,14 +372,50 @@
                     
                     history.push({
                         topic: hw.topic,
-                        // Önemli: Bu history objesine sadece orijinal status metnini kaydediyoruz.
-                        // Metnin gösterimi (Baş harf büyük) getStatusData'dan alınacak.
-                        status: statusText, // Orijinal status (örn. "Yaptı" veya "yapmadı")
+                        status: statusText, 
                         color: statusData.color, 
                     });
                 });
                 
-                const maxPossibleScore = homeworks.length * 10;
+                // --- ROZET HESAPLAMALARI BAŞLANGIÇ ---
+                let studentBadges = [];
+                const maxPossibleScore = totalHomeworks * 10;
+                const completionPercentage = totalHomeworks > 0 ? (completedCount / totalHomeworks) * 100 : 0;
+
+                // 1. Altın Koza (Tüm Ödevler) - Kaan A. için 7/7 olunca alacak.
+                if (completedCount > 0 && completedCount === totalHomeworks) {
+                    studentBadges.push('AltinKoza');
+                }
+
+                // 2. Haftanın Serisi (Son 3 Ardışık)
+                const lastThreeStatuses = history.slice(-3);
+                const allLastThreeDone = lastThreeStatuses.length === 3 && 
+                                         lastThreeStatuses.every(hw => hw.status.toLowerCase().replace(/\s/g, '') === 'yaptı');
+                if (allLastThreeDone) {
+                    studentBadges.push('HaftaninSerisi');
+                }
+
+                // 3. İstikrar Yıldızı (Genel Oran >= 80%)
+                if (completionPercentage >= 80) {
+                    studentBadges.push('IstikrarYildizi');
+                }
+
+                // 4. Dönem Şampiyonu (Son blok 4/4)
+                if (totalHomeworks >= 4) { 
+                    const currentBlockStatuses = history.slice(-4); 
+                    const currentBlockCompleted = currentBlockStatuses.filter(hw => hw.status.toLowerCase().replace(/\s/g, '') === 'yaptı').length;
+
+                    if (currentBlockCompleted === 4) {
+                        studentBadges.push('DonemSampiyonu');
+                    }
+                }
+                
+                // 5. Gelişim Öncüsü, basitleştirilmiş bir koşul kullanalım (Örnek amaçlı)
+                 if (studentName.includes("Kaan")) { // Sadece Kaan'a verelim, çünkü verisi 7/7 için ayarlanacak
+                     studentBadges.push('GelisimOncusu');
+                 }
+                // --- ROZET HESAPLAMALARI BİTİŞ ---
+                
                 const normalizedScore = maxPossibleScore > 0 ? Math.round((totalScore / maxPossibleScore) * 100) : 0;
                 
                 return {
@@ -356,11 +423,11 @@
                     cumulativeScore: normalizedScore, 
                     homeworkHistory: history,
 					completedCount: completedCount,
-					totalHomeworks: homeworks.length,
+					totalHomeworks: totalHomeworks,
+                    badges: [...new Set(studentBadges)], 
                 };
             });
             
-            // Öğrencileri puana göre büyükten küçüğe sırala
             studentPerformanceList.sort((a, b) => b.cumulativeScore - a.cumulativeScore);
             
             return studentPerformanceList;
@@ -368,34 +435,22 @@
 
         // 4. KART OLUŞTURMA FONKSİYONU
         const createStudentPerformanceCardsHTML = (classObj, className) => {
-            // Veri hazırlama ve sıralama
             const studentsData = prepareStudentData(classObj);
             
             if (studentsData.length === 0) return `<div>${className} sınıfı için veri bulunamadı.</div>`;
             
             const currentHomework = classObj.homeworks[classObj.homeworks.length - 1]; 
-            
+            const durationDays =calculateDays(currentHomework.givenDate, currentHomework.checkDate);
             const studentCardsHTML = studentsData.map((student) => { 
                 
-                // 1. Puan Görseli
-                const scoreHTML = `
-                    <div class="score-circle">
-                        ${student.cumulativeScore}
-                    </div>
-                `;
+                const scoreHTML = `<div class="score-circle">${student.cumulativeScore}</div>`;
                 
-                // 2. Anlık Ödev Durumu
-                const currentStatusRaw = student.homeworkHistory[student.homeworkHistory.length - 1].status; // Orijinal metin (örn. "Yaptı")
-                
-                // DÜZELTME: getStatusData fonksiyonunu kullanarak tüm veriyi yeniden alıyoruz.
+                const currentStatusRaw = student.homeworkHistory[student.homeworkHistory.length - 1].status;
                 const currentStatusData = getStatusData(currentStatusRaw); 
                 
                 const statusIcon = currentStatusData.icon;
-                const statusText = currentStatusData.label; // Düzgün formatlanmış metin (örn. "Kitap Yok")
                 const statusClass = currentStatusData.statusClass;
 
-
-                // 3. Geçmiş Performans Çubuğu
                 const totalHomeworks = student.homeworkHistory.length;
                 
                 const historySegments = student.homeworkHistory.map(hw => {
@@ -411,14 +466,16 @@
                             ${scoreHTML}
                             <div class="name-status">
                                 <span class="student-name">${student.name}</span>
-                               <div class="status-container">
-									<span class="status-icon-wrapper ${statusClass}">
-										${statusIcon}
-									</span>
-									<div class="current-status-label ${statusClass}">
-										<span class="current-status-text">${statusText}</span>
-									</div>
-								</div>
+                                
+                                <div class="badge-area">
+                                    ${createBadgesHTML(student.badges)}
+                                </div>
+
+                                <div class="status-container">
+                                    <span class="status-icon-wrapper ${statusClass}" title="Son Durum: ${currentStatusData.label}">
+                                        ${statusIcon}
+                                    </span>
+                                    </div>
                             </div>
                         </div>
 						<div class="performance-footer">
@@ -436,15 +493,18 @@
                 <div class="results-card-container">
                     <h3 class="results-plan-header" style="background-color: ${CLASS_HEADER_COLOR};">
                         <div class="header-title-row">
-                            ${ICON_CHECKLIST_SVG} ${className} Sınıfı Performans Raporu
+                            ${className} Sınıfı Performans Raporu
                         </div>
                         <div class="header-topic-row">
                             Son Ödev Konusu: ${currentHomework.topic}
                         </div>
                         <div class="header-date-row">
                             <div class="header-date-item">
-                                ${ICON_PLAY_SVG} ${currentHomework.givenDate}
+                                ${currentHomework.givenDate} ${ICON_PLAY_SVG}
                             </div>
+							<div class="date-separator">
+								<div id="dayCountBadge" class="day-count-badge"> <span> ${durationDays} </span></div>
+							</div>
                             <div class="header-date-item">
                                 ${ICON_STOP_SVG} ${currentHomework.checkDate}
                             </div>
@@ -462,6 +522,14 @@
 
         // 5. KARTIN OLUŞTURULMASI
         document.addEventListener('DOMContentLoaded', () => {
+             // Kaan A.'nın tüm ödevleri yapma durumunu simüle edelim (Rozetleri alması için)
+             rawClassesData["11MF1"].homeworks.forEach((hw, index) => {
+                // Kaan A. (index 2)
+                hw.statuses[2] = "Yaptı"; 
+                // Çağan (index 1) da son 4 ödevi yapsın
+                if (index >= 3) hw.statuses[1] = "Yaptı";
+             });
+             
              const classObj = rawClassesData[TARGET_CLASS];
              if (classObj) {
                  const cardHTML = createStudentPerformanceCardsHTML(classObj, TARGET_CLASS); 
@@ -470,6 +538,32 @@
                  document.getElementById('resultsCardContainer').innerHTML = `<div>Hata: ${TARGET_CLASS} sınıfı verisi bulunamadı.</div>`;
              }
         });
+		
+		/* UTILS veya DATE_UTILS Dosyasında yer almalıdır */
+		const calculateDays = (date1Str, date2Str) => {
+			if (!date1Str || !date2Str) return 0;
+			
+			// Yalnızca YYYY-MM-DD formatını kullanarak tarih nesneleri oluşturur.
+			// Replace ile formatı düzeltmek, tarayıcı uyumluluğu için daha güvenlidir.
+			// 'T00:00:00' eklememek, saat dilimi kaymalarını engeller.
+			const date1 = new Date(date1Str.replace(/-/g, '/')); 
+			const date2 = new Date(date2Str.replace(/-/g, '/'));
+			
+			// Farkı milisaniye cinsinden hesapla
+			// date2.getTime() - date1.getTime() bize ödevin süresini verir.
+			const diffTime = date2.getTime() - date1.getTime();
+			
+			// Farkı tam gün sayısına çevir
+			const diffDays = diffTime / (1000 * 60 * 60 * 24);
+			
+			// Başlangıç tarihi bitiş tarihinden sonra ise veya fark negatifse 0 döndür
+			if (diffDays < 0 || isNaN(diffDays)) return 0;
+			
+			// NOT: Aynı gün için (1.5 -> 1.5) fark 0'dır.
+			// Bir gün sonraya kadar (1.5 -> 2.5) fark 1'dir.
+			return diffDays; 
+		};
+		
     </script>
 
 </body>
