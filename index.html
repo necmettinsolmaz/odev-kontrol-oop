@@ -523,7 +523,7 @@
                 classData.homeworks.push(hw);
                 
                 // 3. KRİTİK: DataStore'un ana listesini güncel verilerle senkronize et
-                this.dataStore.updateClass(this.currentClass, classData); 
+                // this.dataStore.updateClass(this.currentClass, classData); 
 
                 // 4. Kalıcı Kayıt: localStorage'a yaz (Artık bu çağrı güncel veriyi kaydeder)
                 this.dataStore.saveClasses();
@@ -1304,4 +1304,5 @@ handleShareToParent = () => {
     <script src="https://cdn.tailwindcss.com"></script>
 
 </body>
+
 </html>
